@@ -1,0 +1,35 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/hello
+    docker:
+      - image: artsy/scala:2.12.7-node
+    steps:
+      - add_ssh_keys
+      - checkout
+      - run:
+          name: Run tests
+          command: sbt test < /dev/null
+      - run:
+          name: Build JAR
+          command: sbt assembly < /dev/null
+      - run: mkdir -p workspace
+      - run: cp target/scala-2.12/hello.jar workspace/hello.jar
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - hello.jar
+  deploy:
+    docker:
+      - image: artsy/hokusai:0.4.6
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: cp workspace/hello.jar .
+      - run: ls -la
+workflows:
+  version: 2
+  default:
+    jobs:
+      - build
+      - deploy
