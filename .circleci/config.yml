@@ -44,8 +44,7 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp/workspace
-      - run: cp workspace/hello.jar .
-      - run: ls -la
+      - run: cp /tmp/workspace/hello.jar .
 workflows:
   version: 2
   default:
